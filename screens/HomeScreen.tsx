@@ -41,14 +41,19 @@ const HomeScreen: React.FC = () => {
 					}}
 					minLength={2}
 					enablePoweredByContainer={false}
+					fetchDetails={true}
 					onPress={(data, details = null) => {
 						dispatch(
 							setOrigin({
-								location: details?.geometry.location,
+								location: {
+									x: details?.geometry.location.lat!,
+									y: details?.geometry.location.lng!,
+								},
 								description: data.description,
 							})
 						);
 						dispatch(setDestination(null));
+						console.log(data, details);
 					}}
 				/>
 				<NavOptions />

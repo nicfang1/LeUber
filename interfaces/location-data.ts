@@ -1,9 +1,6 @@
+import { Point } from "react-native-maps";
+
 export interface Origin {
-	location:
-		| {
-				lat: number;
-				lng: number;
-		  }
-		| undefined;
+	location: Point;
 	description: string;
 }
