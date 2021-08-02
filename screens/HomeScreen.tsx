@@ -53,7 +53,6 @@ const HomeScreen: React.FC = () => {
 							})
 						);
 						dispatch(setDestination(null));
-						console.log(data, details);
 					}}
 				/>
 				<NavOptions />
