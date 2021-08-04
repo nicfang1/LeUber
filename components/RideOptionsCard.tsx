@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/core";
-import React from "react";
+import React, { useState } from "react";
 import {
 	FlatList,
 	Image,
@@ -10,7 +10,18 @@ import {
 } from "react-native";
 import { Icon } from "react-native-elements";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
 import tw from "tailwind-react-native-classnames";
+import { selectTravelTimeInformation } from "../slices/navSlice";
+import "intl";
+import { Platform } from "react-native";
+import "intl/locale-data/jsonp/en";
+
+if (Platform.OS === "android") {
+	if (typeof (Intl as any).__disableRegExpRestore === "function") {
+		(Intl as any).__disableRegExpRestore();
+	}
+}
 
 const data = [
 	{
@@ -33,8 +44,21 @@ const data = [
 	},
 ];
 
+// If we have SURGE pricing
+const SURGE_CHARGE_RATE = 1.5;
+
+interface RideOption {
+	id: string;
+	title: string;
+	multiplier: number;
+	image: string;
+}
+
 const RideOptionsCard = () => {
+	const [selected, setSelected] = useState<RideOption>();
 	const navigation = useNavigation();
+	const travelTimeInformation = useSelector(selectTravelTimeInformation);
+
 	return (
 		<SafeAreaView style={tw`bg-white flex-grow`}>
 			<View>
@@ -44,27 +68,55 @@ const RideOptionsCard = () => {
 				>
 					<Icon name="chevron-left" type="font-awesome" />
 				</TouchableOpacity>
-				<Text style={tw`text-center py-5 text-xl`}>Select a Ride</Text>
+				<Text style={tw`text-center py-5 text-xl`}>
+					Select a Ride - {travelTimeInformation?.distance?.text}
+				</Text>
 			</View>
 
 			<FlatList
 				data={data}
 				keyExtractor={(item) => item.id}
-				renderItem={({ item: { title, multiplier, image } }) => (
+				renderItem={({ item }) => (
 					<TouchableOpacity
-						style={tw`flex-row items-center justify-between px-10`}
+						onPress={() => setSelected(item)}
+						style={
+							selected?.id === item.id
+								? tw`flex-row items-center justify-between px-10 bg-gray-200`
+								: tw`flex-row items-center justify-between px-10`
+						}
 					>
 						<Image
-							style={{ width: 100, height: 100, resizeMode: "contain" }}
-							source={{ uri: image }}
+							style={{ width: 70, height: 70, resizeMode: "contain" }}
+							source={{ uri: item.image }}
 						/>
-						<View>
-							<Text>{title}</Text>
-							<Text>Travel Time ...</Text>
+						<View style={tw`-ml-6`}>
+							<Text style={tw`text-xl font-semibold`}>{item.title}</Text>
+							<Text>{travelTimeInformation?.duration.text} Travel Time</Text>
 						</View>
+						<Text style={tw`text-xl`}>
+							{new Intl.NumberFormat("en-GB", {
+								style: "currency",
+								currency: "GBP",
+							}).format(
+								(travelTimeInformation?.duration.value! *
+									SURGE_CHARGE_RATE *
+									item.multiplier) /
+									100
+							)}
+						</Text>
 					</TouchableOpacity>
 				)}
 			/>
+			<View style={tw`mt-auto border-t border-gray-200`}>
+				<TouchableOpacity
+					style={tw.style(`bg-black py-3 m-3`, { "bg-gray-300": !selected })}
+					disabled={!selected}
+				>
+					<Text style={tw`text-center text-white text-xl`}>
+						Choose {selected?.title}
+					</Text>
+				</TouchableOpacity>
+			</View>
 		</SafeAreaView>
 	);
 };

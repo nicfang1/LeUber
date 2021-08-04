@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { LocationData } from "../interfaces/location-data";
+import { LocationData, TravelInfo } from "../interfaces/location-data";
 import { RootState } from "../store";
 
 interface navState {
 	origin: null | LocationData;
 	destination: null | LocationData;
-	travelTimeInformation: null | number;
+	travelTimeInformation: null | TravelInfo;
 }
 
 const initialState: navState = {
@@ -24,13 +24,14 @@ export const navSlice = createSlice({
 		setDestination: (state, action: PayloadAction<LocationData | null>) => {
 			state.destination = action.payload;
 		},
-		setTravelTime: (state, action: PayloadAction<number>) => {
+		setTravelTimeInformation: (state, action: PayloadAction<TravelInfo>) => {
 			state.travelTimeInformation = action.payload;
 		},
 	},
 });
 
-export const { setDestination, setOrigin, setTravelTime } = navSlice.actions;
+export const { setDestination, setOrigin, setTravelTimeInformation } =
+	navSlice.actions;
 export default navSlice.reducer;
 
 export const selectOrigin = (state: RootState) => state.nav.origin;
