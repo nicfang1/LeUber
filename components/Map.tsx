@@ -39,6 +39,7 @@ const Map = () => {
 					apikey={GOOGLE_MAPS_APIKEY}
 					strokeColor="black"
 					strokeWidth={3}
+					lineDashPattern={[0]}
 				/>
 			)}
 			{origin?.location && (
